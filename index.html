@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Never Let Me Go - Study Organizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ffb6c1, #b2f7ef);
+            margin: 0;
+            padding: 0;
+            color: #333;
+            scroll-behavior: smooth;
+        }
+        header {
+            background: #f06292;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        nav {
+            background: #b2dfdb;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            margin: 0 15px;
+            color: #00695c;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .content-section {
+            background: #fff;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .toolbar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .toolbar button {
+            margin: 0 5px;
+            padding: 10px;
+            background: #8bc34a;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .toolbar button:hover {
+            background: #689f38;
+        }
+        .content-editable {
+            border: 1px solid #ddd;
+            padding: 15px;
+            background-color: #f9f9f9;
+            min-height: 150px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        footer {
+            background: #ff6699;
+            color: #fff;
+            text-align: center;
+            padding: 15px 0;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+        input[type="text"] {
+            padding: 5px;
+            margin-right: 10px;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>Never Let Me Go - Study Organizer</h1>
+</header>
+
+<nav>
+    <a href="#setting">Setting</a>
+    <a href="#characters">Characters</a>
+    <a href="#themes">Themes</a>
+    <a href="#important-moments">Important Moments</a>
+    <a href="#questions">Questions</a>
+    <a href="#additional-sections">Additional Sections</a>
+</nav>
+
+<!-- Setting Section -->
+<div class="content-section" id="setting">
+    <h2>Setting</h2>
+    <input type="text" id="searchInput-setting" placeholder="Search..." onkeydown="if(event.key === 'Enter') searchText('setting')" />
+    <button onclick="searchText('setting')">Search</button>
+
+    <div class="toolbar">
+        <button onclick="toggleBold('setting')">Bold</button>
+        <button onclick="toggleItalic('setting')">Italic</button>
+        <button onclick="highlightText('setting')">Highlight</button>
+        <button onclick="removeHighlight('setting')">Remove Highlight</button>
+        <button onclick="changeFontSize('setting', 'increase')">A+</button>
+        <button onclick="changeFontSize('setting', 'decrease')">A-</button>
+        <button onclick="changeTextColor('setting')">Text Color</button>
+        <input type="color" id="colorPicker-setting" onchange="updateTextColor('setting')">
+    </div>
+
+    <div class="content-editable" contenteditable="true" id="setting-content">
+        <h3>Key Locations</h3>
+        <p><strong>Hailsham:</strong> A secluded boarding school where Kathy, Tommy, and Ruth grow up...</p>
+        <p><strong>Explanation:</strong> Hailsham represents a space of innocence...</p>
+    </div>
+</div>
+
+<script>
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAA6IM_CGfc749lOpY8nMmhD0BwcyY0NnE",
+  authDomain: "never-let-me-go-organizer.firebaseapp.com",
+  projectId: "never-let-me-go-organizer",
+  storageBucket: "never-let-me-go-organizer.appspot.com",
+  messagingSenderId: "464059546986",
+  appId: "1:464059546986:web:2100c7ef5f3a2b071d7913"
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const database = firebase.database(app);
+
+// Reference to the 'setting' part of the database
+const settingRef = database.ref('sections/setting');
+
+// Function to save content to Firebase
+function saveContentToFirebase(content) {
+  settingRef.set({ text: content })
+    .then(() => {
+      console.log("Content saved to Firebase");
+    })
+    .catch((error) => {
+      console.error("Error saving content: ", error);
+    });
+}
+
+// Listen for changes to the content-editable area
+const settingDiv = document.getElementById('setting-content');
+settingDiv.addEventListener('input', () => {
+  const newText = settingDiv.innerText;
+  saveContentToFirebase(newText);  // Save the updated content to Firebase
+});
+
+// Function to retrieve content from Firebase
+settingRef.on('value', (snapshot) => {
+  const data = snapshot.val();
+  if (data && data.text) {
+    settingDiv.innerText = data.text;  // Set the content in the editable div
+  }
+});
+
+</script>
+
+</body>
+</html>
